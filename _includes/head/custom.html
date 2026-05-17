@@ -1,17 +1,40 @@
 {% include base_path %}
 
-<!-- start custom head snippets -->
+<!-- ==========================================================================
+     Daniel Vykoukal — Clean Dark CMU Sans Serif redesign
+     ========================================================================== -->
+
+<!-- Computer Modern web font (true CMU Sans Serif / Serif / Typewriter) -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/aaaakshat/cm-web-fonts@latest/fonts.css" />
+
+<!-- Default to the dark theme on first visit unless the visitor has explicitly
+     chosen "light". Runs before paint so we don't flash the wrong palette. -->
+<script>
+  (function () {
+    try {
+      var pref = localStorage.getItem("theme");
+      if (pref !== "light") {
+        document.documentElement.setAttribute("data-theme", "dark");
+        if (pref !== "dark") { localStorage.setItem("theme", "dark"); }
+      }
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  })();
+</script>
+
+<!-- Override stylesheet — loaded AFTER main.css so it always wins. -->
+<link rel="stylesheet" href="{{ base_path }}/assets/css/custom.css" />
 
 <!-- Support for Academicons -->
-<link rel="stylesheet" href="{{ base_path }}/assets/css/academicons.css"/>
+<link rel="stylesheet" href="{{ base_path }}/assets/css/academicons.css" />
 
 <!-- favicon from https://commons.wikimedia.org/wiki/File:OOjs_UI_icon_academic-progressive.svg -->
-<link rel="apple-touch-icon" sizes="180x180" href="{{ base_path }}/images/apple-touch-icon-180x180.png"/>
-<link rel="icon" type="image/svg+xml" href="{{ base_path }}/images/favicon.svg"/>
-<link rel="icon" type="image/png" href="{{ base_path }}/images/favicon-32x32.png" sizes="32x32"/>
-<link rel="icon" type="image/png" href="{{ base_path }}/images/favicon-192x192.png" sizes="192x192"/>
-<link rel="manifest" href="{{ base_path }}/images/manifest.json"/>
-<link rel="icon" href="/images/favicon.ico"/>
-<meta name="theme-color" content="#ffffff"/>
-
-<!-- end custom head snippets -->
+<link rel="apple-touch-icon" sizes="180x180" href="{{ base_path }}/images/apple-touch-icon-180x180.png" />
+<link rel="icon" type="image/svg+xml" href="{{ base_path }}/images/favicon.svg" />
+<link rel="icon" type="image/png" href="{{ base_path }}/images/favicon-32x32.png" sizes="32x32" />
+<link rel="icon" type="image/png" href="{{ base_path }}/images/favicon-192x192.png" sizes="192x192" />
+<link rel="manifest" href="{{ base_path }}/images/manifest.json" />
+<link rel="icon" href="/images/favicon.ico" />
+<meta name="theme-color" content="#16181c" />

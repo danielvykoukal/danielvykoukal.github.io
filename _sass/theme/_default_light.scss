@@ -1,48 +1,54 @@
 /* ==========================================================================
-    DEFAULT THEME - LIGHT VERSION
-    ========================================================================== */
-/* Color codes used for the theme */
-$primary-color              : #2f7f93;
-$gray                       : #7a8288;
-$dark-gray                  : mix(#000, $gray, 40%);
-$darker-gray                : mix(#000, $gray, 60%);
-$light-gray                 : mix(#fff, $gray, 50%);
-$lighter-gray               : mix(#fff, $gray, 90%);
+   DEFAULT THEME — LIGHT · Paper / Mono / CMU
+   ========================================================================== */
 
-/* Color codes used for the site */
-$danger-color               : #ee5f5b;
-$info-color                 : #2f7f93;
-$notice-color               : #7a8288;
-$success-color              : #62c462;
-$warning-color              : #f89406;
+$primary-color              : #16181c;
+$gray                       : #6c6f76;
+$dark-gray                  : #3a3d44;
+$darker-gray                : #16181c;
+$light-gray                 : #a9acb1;
+$lighter-gray               : #d8d6cf;
 
-/* Other basic settings for the template */
-$border-radius              : 4px;
-$box-shadow                 : 0 1px 1px rgba(0, 0, 0, 0.125);
-$global-transition          : all 0.2s ease-in-out;
-$masthead-height            : 70px;
+$background                 : #f5f4ef;
+$background-elev            : #ffffff;
+$background-sunken          : #ecebe5;
+$rule                       : #d8d6cf;
+$rule-soft                  : #e6e4dd;
+$text                       : #16181c;
+$text-soft                  : #3a3d44;
+$text-mute                  : #6c6f76;
+
+$danger-color               : #b34a3f;
+$info-color                 : #6c6f76;
+$notice-color               : #6c6f76;
+$success-color              : #4a6b3a;
+$warning-color              : #8a6a1f;
+
+$border-radius              : 3px;
+$box-shadow                 : none;
+$global-transition          : all 0.18s ease-in-out;
+$masthead-height            : 64px;
 $navicon-width              : 28px;
-$navicon-height             : 4px;
+$navicon-height             : 2px;
 $sidebar-link-max-width     : 250px;
 $sidebar-screen-min-width   : 1024px;
 
-/* Default light theme for the site */
+/* Light theme tokens — used when data-theme is NOT "dark" */
 :root {
-    --global-base-color                 : #{$primary-color};
-    --global-bg-color                   : #fff;
-    --global-footer-bg-color            : #f2f3f3;
-    --global-border-color               : #{$lighter-gray};
-    --global-dark-border-color          : #bdc1c4;
-    --global-code-background-color      : #fafafa;
-    --global-code-text-color            : #{$darker-gray};
-    --global-fig-caption-color          : mix(#fff,  #{$dark-gray}, 25%);
-    --global-link-color                 : #52adc8;
-    --global-link-color-hover           : mix(#000, #2f7f93, 25%);
-    --global-link-color-visited         : mix(#fff, #2f7f93, 25%);  
-    --global-masthead-link-color        : #{$dark-gray};
-    --global-masthead-link-color-hover  : mix(#000, #{$gray}, 25%);    
-    --global-text-color                 : #{$dark-gray};
-    --global-text-color-light           : #{$light-gray};
-    --global-thead-color                : #{$lighter-gray};
+    --global-base-color                 : #{$text};
+    --global-bg-color                   : #{$background};
+    --global-footer-bg-color            : #{$background};
+    --global-border-color               : #{$rule};
+    --global-dark-border-color          : #{$rule};
+    --global-code-background-color      : #{$background-sunken};
+    --global-code-text-color            : #{$text};
+    --global-fig-caption-color          : #{$text-mute};
+    --global-link-color                 : #{$text};
+    --global-link-color-hover           : #{$text-mute};
+    --global-link-color-visited         : #{$text-soft};
+    --global-masthead-link-color        : #{$text};
+    --global-masthead-link-color-hover  : #{$text-mute};
+    --global-text-color                 : #{$text-soft};
+    --global-text-color-light           : #{$text-mute};
+    --global-thead-color                : #{$background-elev};
 }
-
