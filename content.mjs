@@ -79,14 +79,14 @@ export const research = [
 ];
 
 export const writing = {
-  intro: "Commentary written at Moody’s, with the data and code where it is public.",
+  intro: "Commentary written at Moody’s.",
   items: [
     {
       title: "Euro Zone Savings: Increasing and Shifting",
       dek: "Following a series of crises, the household saving rate is stuck above its pre-pandemic norm.",
       meta: "with Annabelle Ren Fang and Olia Kuranova · Moody’s",
       date: "28 August 2026",
-      links: [{ label: "Code", href: "https://github.com/danielvykoukal/precautionary_savings_eu" }],
+      links: [{ label: "PDF", href: "/assets/files/euro-zone-savings.pdf" }],
     },
     {
       title: "The Artificial Intelligence Ownership Gap",
@@ -95,7 +95,7 @@ export const writing = {
       date: "21 August 2026",
       links: [
         { label: "Read", href: "https://www.economy.com/economicview/analysis/423628/The-Artificial-Intelligence-Ownership-Gap" },
-        { label: "Code", href: "https://github.com/danielvykoukal/ai_investment_us_eu" },
+        { label: "PDF", href: "/assets/files/ai-ownership-gap.pdf" },
       ],
     },
   ],

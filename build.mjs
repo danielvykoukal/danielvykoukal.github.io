@@ -10,7 +10,7 @@ const nav = [
   ["/", "Home"],
   ["/research/", "Research"],
   ["/cv/", "CV"],
-  ["/writing/", "Writing"],
+  ["/writing/", "Public"],
 ];
 
 const page = (path, title, body) => `<!doctype html>
@@ -81,7 +81,7 @@ const cvBody = hasCvPdf
 <iframe class="cv-pdf" src="${cvPdf}" title="CV of ${site.name} (PDF)"></iframe>`
   : cvHtml;
 
-const writingBody = `<div class="page-head"><h1>Writing</h1><p>${writing.intro}</p></div>
+const writingBody = `<div class="page-head"><h1>Commentaries</h1><p>${writing.intro}</p></div>
 ${row("Commentary", writing.items.map((w) => `<article class="entry">
 <h3>${w.title}</h3>
 <p class="dek">${w.dek}</p>
@@ -96,7 +96,7 @@ const pages = {
   "research/index.html": page("/research/", `Research · ${site.name}`, researchBody),
   "cv/index.html": page("/cv/", `CV · ${site.name}`, cvBody),
   ...(hasCvPdf && { "cv/print/index.html": page("/cv/print/", `CV · ${site.name}`, cvHtml) }),
-  "writing/index.html": page("/writing/", `Writing · ${site.name}`, writingBody),
+  "writing/index.html": page("/writing/", `Commentaries · ${site.name}`, writingBody),
   "404.html": page("/404.html", `Not found · ${site.name}`, notFound),
 };
 
