@@ -1,0 +1,5 @@
+dist/
+cv.*
+.DS_Store
+.claude/
+phd-cv/

@@ -1,0 +1,9 @@
+{
+  "name": "daniel-vykoukal-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs --with-cv-pdf && node scripts/cv-pdf.mjs",
+    "dev": "npm run build && python3 -m http.server 8123 -d dist"
+  }
+}
