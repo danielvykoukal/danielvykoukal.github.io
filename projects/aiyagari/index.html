@@ -1,0 +1,161 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aiyagari</title>
+<style>
+  html, body { margin: 0; height: 100%; background: white; overflow: hidden; }
+  video { position: fixed; inset: 0; width: 100vw; height: 100vh;
+          object-fit: contain; background: white; outline: none; }
+  video.back { visibility: hidden; }
+  body.idle { cursor: none; }
+  /* Player text in CMU Sans Serif, like the slides' text (user, 2026-11-17). */
+  #hint { position: fixed; bottom: 12px; left: 16px; font: 13px "CMU Sans Serif", system-ui;
+          color: #888; opacity: 0; transition: opacity .3s; pointer-events: none; }
+  /* Slide number, bottom-right of the picture; aiyagari.py keeps that corner clear. */
+  #badge { position: fixed; z-index: 5; pointer-events: none; line-height: 1; white-space: nowrap;
+           font-family: "CMU Sans Serif", system-ui, sans-serif; font-variant-numeric: tabular-nums; color: #8a8a96;
+           background: rgba(234, 234, 240, .92); border-radius: 999px; padding: .3em .75em; }
+  #badge:empty { display: none; }
+  /* Proof jumps: #proof lies exactly on the chip drawn in the video; #back is a small chip
+     in the top-right corner of the proof slides (their own corners hold slide content). */
+  .jump { position: fixed; z-index: 10; cursor: pointer; border-radius: 8px; }
+  .jump[hidden] { display: none; }
+  #proof { background: transparent; border: 2px solid transparent; padding: 0; }
+  #proof:hover { border-color: rgba(43, 89, 195, .5); }
+  #back { background: #fff; color: #2b59c3; border: 2px solid #2b59c3; padding: 5px 12px;
+          font: 600 14px "CMU Sans Serif", system-ui; opacity: .8; }
+  #back:hover { opacity: 1; }
+  body.idle .jump { cursor: none; }
+</style></head>
+<body>
+<video id="a" muted playsinline preload="auto"></video>
+<video id="b" class="back" muted playsinline preload="auto"></video>
+<div id="hint"></div>
+<div id="badge"></div>
+<button id="proof" class="jump" hidden title="Jump to the proof (P)"></button>
+<button id="back" class="jump" hidden title="Back to the talk (B)">&larr; back</button>
+<script>
+const SLIDES = [{"src": "assets/092edc29f446879a.mp4", "loop": false}, {"src": "assets/1bf09b0f5daa8b52.mp4", "loop": false}, {"src": "assets/47d9f349d8e4151d.mp4", "loop": false}, {"src": "assets/bfa4d3fb209686db.mp4", "loop": false}, {"src": "assets/e2efff6d3b3bf531.mp4", "loop": false}, {"src": "assets/9f5e0bf3efe16fb6.mp4", "loop": false}, {"src": "assets/32d0c850962ad215.mp4", "loop": false}, {"src": "assets/9826772edce4ab6a.mp4", "loop": false}, {"src": "assets/95df280ed88ca548.mp4", "loop": false}, {"src": "assets/6de28470d7e2205d.mp4", "loop": false}, {"src": "assets/eb16082eda9d0f65.mp4", "loop": false}, {"src": "assets/be2660d04e84185e.mp4", "loop": false}, {"src": "assets/c0e3b95e83824f09.mp4", "loop": false}, {"src": "assets/c3ebc06e007f87eb.mp4", "loop": false}, {"src": "assets/3b5c752cc3aa667a.mp4", "loop": false}, {"src": "assets/be9cdd948dffbfee.mp4", "loop": false}, {"src": "assets/8066abc1546c75eb.mp4", "loop": false}, {"src": "assets/198abf529428b51c.mp4", "loop": false}, {"src": "assets/59c4a0269bf493f0.mp4", "loop": false}, {"src": "assets/0833c4d4321c0df6.mp4", "loop": false}, {"src": "assets/fc6bd7cfb253770e.mp4", "loop": false}, {"src": "assets/00a4d6a6d6084506.mp4", "loop": false}, {"src": "assets/6d4c2854ad3179cf.mp4", "loop": false}, {"src": "assets/b07809c84a3b6415.mp4", "loop": false}, {"src": "assets/3a4b9aaeb4b1bd5c.mp4", "loop": false}, {"src": "assets/bd664380c784e816.mp4", "loop": false}, {"src": "assets/378ca8a6cafb8844.mp4", "loop": false}, {"src": "assets/cacb0293424a72f4.mp4", "loop": false}, {"src": "assets/85f3e7c45780356c.mp4", "loop": false}, {"src": "assets/02c5bdae893e043a.mp4", "loop": false}, {"src": "assets/b8a46aa1bda498fc.mp4", "loop": false}, {"src": "assets/4c30302099589c3b.mp4", "loop": false}, {"src": "assets/a21e250a17b638d1.mp4", "loop": false}, {"src": "assets/d0b7021d5fa6f48d.mp4", "loop": false}, {"src": "assets/c5e39ea990075a55.mp4", "loop": false}, {"src": "assets/6beda75ba817a943.mp4", "loop": false}, {"src": "assets/0ca67dc05888f5dc.mp4", "loop": false}, {"src": "assets/2311d1a560e3505e.mp4", "loop": false}, {"src": "assets/6d85e7ec37c1feeb.mp4", "loop": false}, {"src": "assets/6e897d5a247e0b5f.mp4", "loop": false}, {"src": "assets/170a20ab9b8484ef.mp4", "loop": false}, {"src": "assets/77db7c49e7f0029a.mp4", "loop": false}, {"src": "assets/7304aa93f52e892c.mp4", "loop": false}, {"src": "assets/2d51feeef6b14f88.mp4", "loop": false}, {"src": "assets/8afbd4bb85b6de97.mp4", "loop": false}, {"src": "assets/e57e80697a9adc88.mp4", "loop": false}, {"src": "assets/cf4de93740f2f857.mp4", "loop": false}, {"src": "assets/81a8a4ccb5847259.mp4", "loop": false}, {"src": "assets/b31578fb4ce04546.mp4", "loop": false}, {"src": "assets/c68cc90cae2c28e0.mp4", "loop": false}, {"src": "assets/4c1dd4dbe6f7c272.mp4", "loop": false}, {"src": "assets/f22267ac94626943.mp4", "loop": false}, {"src": "assets/dca50c411578bda7.mp4", "loop": false}, {"src": "assets/af8ab7f75fd071a7.mp4", "loop": false}, {"src": "assets/4d27c14ff4abf95e.mp4", "loop": false}, {"src": "assets/d722ca43935ebdaf.mp4", "loop": false}, {"src": "assets/057091aeca471a77.mp4", "loop": false}, {"src": "assets/c982be0a4453d305.mp4", "loop": false}, {"src": "assets/77c2427c8d2674ac.mp4", "loop": false}, {"src": "assets/eaadc7d9d8dcb2a6.mp4", "loop": false}, {"src": "assets/37369dfd635c2d61.mp4", "loop": false}, {"src": "assets/013e0ccbb0261fbb.mp4", "loop": false}, {"src": "assets/1b272fc45cea08e0.mp4", "loop": false}, {"src": "assets/39668204a817d78f.mp4", "loop": false}, {"src": "assets/9da738461b31004f.mp4", "loop": false}, {"src": "assets/94a40e27a08a14ef.mp4", "loop": false}, {"src": "assets/449851272c3d9e27.mp4", "loop": false}, {"src": "assets/acbd74abb95aa535.mp4", "loop": false}, {"src": "assets/b24ea550ad97ac73.mp4", "loop": false}, {"src": "assets/a99e8cf9d9f9f2ef.mp4", "loop": false}, {"src": "assets/a171b69f91a454ad.mp4", "loop": false}, {"src": "assets/954de85de4fa9ede.mp4", "loop": false}, {"src": "assets/25570838a3e5c185.mp4", "loop": false}, {"src": "assets/804d850546e93676.mp4", "loop": false}, {"src": "assets/82d1e5a12f494a00.mp4", "loop": false}, {"src": "assets/45e167ee012429cf.mp4", "loop": false}, {"src": "assets/e013ca194998bf3c.mp4", "loop": false}, {"src": "assets/082654aa3c95b0a9.mp4", "loop": false}, {"src": "assets/3caf0cadc1c70fd4.mp4", "loop": false}, {"src": "assets/d0ac88626529c979.mp4", "loop": false}, {"src": "assets/169d07bc318be247.mp4", "loop": false}, {"src": "assets/657e011e97003120.mp4", "loop": false}, {"src": "assets/042d8b21c3f259e5.mp4", "loop": false}, {"src": "assets/506903d621407cc0.mp4", "loop": false}, {"src": "assets/1900b545b70460c0.mp4", "loop": false}, {"src": "assets/94d79f9de5d433cd.mp4", "loop": false}, {"src": "assets/b14e2a65f6dc63a0.mp4", "loop": false}, {"src": "assets/b619db6f72580f53.mp4", "loop": false}, {"src": "assets/4af3fe1c0d851392.mp4", "loop": false}, {"src": "assets/64b287364cbd8cda.mp4", "loop": false}, {"src": "assets/bf32c483549d3e18.mp4", "loop": false}, {"src": "assets/729ab3a40e1659a5.mp4", "loop": false}, {"src": "assets/39614cb66f551f55.mp4", "loop": false}, {"src": "assets/280a5c9c6a95b6b5.mp4", "loop": false}, {"src": "assets/00c68d7ead28ad84.mp4", "loop": false}, {"src": "assets/b84abf2ca9554faf.mp4", "loop": false}, {"src": "assets/42414880f9aedb4e.mp4", "loop": false}, {"src": "assets/d92742485747bd4c.mp4", "loop": false}, {"src": "assets/16dcb9cf39c27692.mp4", "loop": false}, {"src": "assets/5451f844a2d08247.mp4", "loop": false}, {"src": "assets/391a919978d1a54f.mp4", "loop": false}, {"src": "assets/17b94196544a30a9.mp4", "loop": false}, {"src": "assets/4b4a16add9f56f59.mp4", "loop": false}, {"src": "assets/46e27b78e5192e3b.mp4", "loop": false}, {"src": "assets/dafc75764895b773.mp4", "loop": false}, {"src": "assets/0bf00e901e4d01b2.mp4", "loop": false}, {"src": "assets/85f5165eb5d1cdb0.mp4", "loop": false}, {"src": "assets/fb29bae2f882f5e3.mp4", "loop": false}, {"src": "assets/631766893dece337.mp4", "loop": false}, {"src": "assets/3ed4f9053d3fac0e.mp4", "loop": false}, {"src": "assets/8cc4c3b2db0b8b4a.mp4", "loop": false}, {"src": "assets/4228ccef9e7fd985.mp4", "loop": false}, {"src": "assets/9cacfd174511942d.mp4", "loop": false}, {"src": "assets/4732b8cfde903796.mp4", "loop": false}, {"src": "assets/b70bb8efd3240c49.mp4", "loop": false}, {"src": "assets/79f92a06a0002a1d.mp4", "loop": false}, {"src": "assets/0a937febbdc52385.mp4", "loop": false}, {"src": "assets/6d43fbbfa10f32d8.mp4", "loop": false}, {"src": "assets/5116b9b368eb9a29.mp4", "loop": false}, {"src": "assets/d43b5394f892a6e8.mp4", "loop": false}, {"src": "assets/1cd7fad26be5edb4.mp4", "loop": false}, {"src": "assets/ca895ab3cdc0b3e5.mp4", "loop": false}, {"src": "assets/9610a39ab62f3f4d.mp4", "loop": false}, {"src": "assets/097dec58847833f2.mp4", "loop": false}, {"src": "assets/e661a8cedd18af5b.mp4", "loop": false}, {"src": "assets/4c4dd4b41f42c6ad.mp4", "loop": false}, {"src": "assets/f0605c2a4f5f0109.mp4", "loop": false}, {"src": "assets/bbe3409995ebce33.mp4", "loop": false}, {"src": "assets/6d1e24f8f14ce040.mp4", "loop": false}, {"src": "assets/c12b2ea21273b2be.mp4", "loop": false}, {"src": "assets/0a0c73fdb31740e2.mp4", "loop": false}, {"src": "assets/7973f91d10f7f362.mp4", "loop": false}, {"src": "assets/c6ca4195c86222e0.mp4", "loop": false}, {"src": "assets/8a6823c664aec843.mp4", "loop": false}, {"src": "assets/bf56962a080c8090.mp4", "loop": false}, {"src": "assets/d54c38e5e58e2821.mp4", "loop": false}, {"src": "assets/73b2f54b34db3b5b.mp4", "loop": false}, {"src": "assets/eae8549de754671d.mp4", "loop": false}, {"src": "assets/b8d8587f4abbb800.mp4", "loop": false}, {"src": "assets/fe793ebc3f12775a.mp4", "loop": false}, {"src": "assets/ed69c83cd3d2f0c8.mp4", "loop": false}, {"src": "assets/4aecada4256cf1b1.mp4", "loop": false}, {"src": "assets/5a76aff0d605d06e.mp4", "loop": false}, {"src": "assets/9987098c0a8b7d59.mp4", "loop": false}, {"src": "assets/e1de957a352ea78b.mp4", "loop": false}, {"src": "assets/ba3d321a1abdc2f7.mp4", "loop": false}, {"src": "assets/4b320252f2dd215a.mp4", "loop": false}, {"src": "assets/399891876cb62751.mp4", "loop": false}, {"src": "assets/c74347a5c2d8bb0d.mp4", "loop": false}, {"src": "assets/3b3ef34b3ac08b8e.mp4", "loop": false}, {"src": "assets/68dffde27cf7fdc1.mp4", "loop": false}, {"src": "assets/28a816292898cb47.mp4", "loop": false}, {"src": "assets/8996d62c57bf5b8a.mp4", "loop": false}, {"src": "assets/ea7bdde5be814280.mp4", "loop": false}, {"src": "assets/4e5d35d859a1aa1a.mp4", "loop": false}, {"src": "assets/9e5107ae0790873a.mp4", "loop": false}, {"src": "assets/8b8d4e5223923851.mp4", "loop": false}, {"src": "assets/c586488f321febb0.mp4", "loop": false}, {"src": "assets/7e4ab72f0b5b8724.mp4", "loop": false}, {"src": "assets/e78aa9df64f49416.mp4", "loop": false}, {"src": "assets/dd2c5d8e503b5cc9.mp4", "loop": false}, {"src": "assets/2f910e0ffd484fd9.mp4", "loop": false}, {"src": "assets/ac6ef6846365750a.mp4", "loop": false}, {"src": "assets/aa25ab3dfecb2f84.mp4", "loop": false}, {"src": "assets/fbd07d3f9a4aca09.mp4", "loop": false}, {"src": "assets/b501a10064084ed6.mp4", "loop": false}, {"src": "assets/47dc68c49935f34d.mp4", "loop": false}, {"src": "assets/e1efbd087cbafc1e.mp4", "loop": false}, {"src": "assets/9d27f0601a13012d.mp4", "loop": false}, {"src": "assets/c084e01bc1ed33b2.mp4", "loop": false}, {"src": "assets/21a44a64eae5cff0.mp4", "loop": false}, {"src": "assets/e8f615f2e96e18e3.mp4", "loop": false}, {"src": "assets/f2a5c32d197fe9a8.mp4", "loop": false}, {"src": "assets/3b6e1f08e83c72b5.mp4", "loop": false}, {"src": "assets/28ee1b244b0f8397.mp4", "loop": false}, {"src": "assets/b143a96b643efc23.mp4", "loop": false}, {"src": "assets/032f824064d19d28.mp4", "loop": false}, {"src": "assets/538eb85a94143c11.mp4", "loop": false}, {"src": "assets/d85f3389813ba143.mp4", "loop": false}, {"src": "assets/6ed79a67baf2d8c4.mp4", "loop": false}, {"src": "assets/6c16510991cb3a7d.mp4", "loop": false}, {"src": "assets/a487cadb69088aea.mp4", "loop": false}, {"src": "assets/1e7f4c22d35986d7.mp4", "loop": false}, {"src": "assets/3e9544c550935fc7.mp4", "loop": false}, {"src": "assets/eafc9524d40c0db3.mp4", "loop": false}, {"src": "assets/1d29a767a1740345.mp4", "loop": false}, {"src": "assets/d32b86f42d35751a.mp4", "loop": false}, {"src": "assets/3f7f04fc97cccec9.mp4", "loop": false}, {"src": "assets/4adfd105b8476136.mp4", "loop": false}, {"src": "assets/009bd0be02b91aa2.mp4", "loop": false}, {"src": "assets/30d1e4875b4df9b5.mp4", "loop": false}, {"src": "assets/39362987e70a8a80.mp4", "loop": false}, {"src": "assets/ec7c2f323b5486ab.mp4", "loop": false}, {"src": "assets/de617afbba4294e8.mp4", "loop": false}, {"src": "assets/b95ec03a03ef622e.mp4", "loop": false}, {"src": "assets/281fb4ca735bf8ad.mp4", "loop": false}, {"src": "assets/3472f37277bef38a.mp4", "loop": false}, {"src": "assets/3e73ec2931a8b97e.mp4", "loop": false}, {"src": "assets/55565743dd8125e8.mp4", "loop": false}, {"src": "assets/63b23be7795d2870.mp4", "loop": false}, {"src": "assets/fcc577020e7e963d.mp4", "loop": false}, {"src": "assets/5d37fd00f3bdaf3b.mp4", "loop": false}, {"src": "assets/ea7538b90f69d7bb.mp4", "loop": false}, {"src": "assets/3c1b7d5ad19fa56d.mp4", "loop": false}, {"src": "assets/fbde446aef050b4b.mp4", "loop": false}, {"src": "assets/6669eb8a18dc50a2.mp4", "loop": false}, {"src": "assets/98c7dc08c7e2b794.mp4", "loop": false}, {"src": "assets/5a94c5fb555c7aea.mp4", "loop": false}, {"src": "assets/bbb1ecf951a0e486.mp4", "loop": false}, {"src": "assets/deea42a0ffeb64a3.mp4", "loop": false}, {"src": "assets/c9f7c39ace103496.mp4", "loop": false}, {"src": "assets/a2d3d55e08379467.mp4", "loop": false}, {"src": "assets/d1ff72257e8e2ffd.mp4", "loop": false}, {"src": "assets/47acdf6df1e780d8.mp4", "loop": false}, {"src": "assets/06a06acc0cefd158.mp4", "loop": false}, {"src": "assets/d2c92dc598d5cede.mp4", "loop": false}, {"src": "assets/f4fb536c4f4ad130.mp4", "loop": false}, {"src": "assets/adac9d71c4d816df.mp4", "loop": false}, {"src": "assets/e369a1ec2fba5aa7.mp4", "loop": false}, {"src": "assets/ca1a19e3687032db.mp4", "loop": false}, {"src": "assets/7857a1b1e74b7bd2.mp4", "loop": false}, {"src": "assets/91107c042606114d.mp4", "loop": false}];
+let front = document.getElementById("a"), back = document.getElementById("b");
+let i = 0, busy = false;
+
+// Resolve once a video has a decoded frame on screen.
+function frameReady(v) {
+  return new Promise(res => {
+    if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(() => res());
+    else v.addEventListener("playing", () => requestAnimationFrame(() => res()), {once: true});
+  });
+}
+function load(v, n) {
+  return new Promise(res => {
+    v.loop = SLIDES[n].loop;
+    if (v.dataset.n == n && v.readyState >= 2) return res();
+    v.dataset.n = n;
+    v.src = SLIDES[n].src;
+    v.addEventListener("loadeddata", () => res(), {once: true});
+    v.load();
+  });
+}
+function swap() {
+  back.classList.remove("back"); front.classList.add("back");
+  [front, back] = [back, front];
+  front.focus();
+}
+async function show(n, atEnd) {
+  if (n < 0 || n >= SLIDES.length || busy) return;
+  busy = true;
+  front.pause();
+  await load(back, n);
+  if (atEnd) {                       // going backwards: show the slide's last frame
+    back.currentTime = Math.max(0, back.duration - 0.02);
+    await new Promise(r => back.addEventListener("seeked", r, {once: true}));
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  } else {
+    back.currentTime = 0;
+    const ready = frameReady(back);
+    back.play().catch(() => {});
+    await ready;
+  }
+  swap();
+  i = n;
+  updateButtons();
+  hint(`${i + 1} / ${SLIDES.length}`);
+  busy = false;
+  if (i + 1 < SLIDES.length) load(back, i + 1);   // preload the next slide
+}
+
+let hintT;
+function hint(t) {
+  const h = document.getElementById("hint");
+  h.textContent = t; h.style.opacity = 1;
+  clearTimeout(hintT); hintT = setTimeout(() => h.style.opacity = 0, 1200);
+}
+let idleT;
+document.addEventListener("mousemove", () => {
+  document.body.classList.remove("idle");
+  clearTimeout(idleT); idleT = setTimeout(() => document.body.classList.add("idle"), 1500);
+});
+
+// Proof jumps. A jump cuts (no pan): the target slide starts on a still title card, and
+// "back" shows the last frame of the slide we came from (or of the main-talk slide).
+const PROOF = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 183, 183, 183, -1, 201, 201, 201, 201, 201, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], BACK = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, 164, -1, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170], CHIP = {"left": 0.735546875, "top": 0.9125, "width": 0.13359375, "height": 0.0625}, RES = [3840, 2160], BADGE = ["1 / 43", "2.1 / 43", "2.2 / 43", "2.3 / 43", "3 / 43", "4.1 / 43", "4.2 / 43", "5.1 / 43", "5.2 / 43", "5.3 / 43", "5.4 / 43", "5.5 / 43", "6.1 / 43", "6.2 / 43", "7.1 / 43", "7.2 / 43", "8 / 43", "9 / 43", "10.1 / 43", "10.2 / 43", "10.3 / 43", "10.4 / 43", "10.5 / 43", "11.1 / 43", "11.2 / 43", "11.3 / 43", "12 / 43", "13.1 / 43", "13.2 / 43", "13.3 / 43", "13.4 / 43", "13.5 / 43", "13.6 / 43", "13.7 / 43", "14 / 43", "15.1 / 43", "15.2 / 43", "15.3 / 43", "16.1 / 43", "16.2 / 43", "16.3 / 43", "16.4 / 43", "16.5 / 43", "17.1 / 43", "17.2 / 43", "17.3 / 43", "18.1 / 43", "18.2 / 43", "18.3 / 43", "18.4 / 43", "18.5 / 43", "18.6 / 43", "19 / 43", "20.1 / 43", "20.2 / 43", "20.3 / 43", "21.1 / 43", "21.2 / 43", "21.3 / 43", "21.4 / 43", "21.5 / 43", "21.6 / 43", "21.7 / 43", "21.8 / 43", "21.9 / 43", "21.10 / 43", "21.11 / 43", "21.12 / 43", "21.13 / 43", "21.14 / 43", "21.15 / 43", "21.16 / 43", "22.1 / 43", "22.2 / 43", "22.3 / 43", "23.1 / 43", "23.2 / 43", "23.3 / 43", "23.4 / 43", "23.5 / 43", "24 / 43", "25.1 / 43", "25.2 / 43", "25.3 / 43", "25.4 / 43", "25.5 / 43", "25.6 / 43", "25.7 / 43", "25.8 / 43", "25.9 / 43", "25.10 / 43", "25.11 / 43", "25.12 / 43", "25.13 / 43", "25.14 / 43", "26.1 / 43", "26.2 / 43", "26.3 / 43", "26.4 / 43", "26.5 / 43", "26.6 / 43", "26.7 / 43", "27.1 / 43", "27.2 / 43", "27.3 / 43", "27.4 / 43", "27.5 / 43", "27.6 / 43", "27.7 / 43", "27.8 / 43", "27.9 / 43", "27.10 / 43", "28.1 / 43", "28.2 / 43", "29.1 / 43", "29.2 / 43", "30.1 / 43", "30.2 / 43", "30.3 / 43", "30.4 / 43", "30.5 / 43", "30.6 / 43", "30.7 / 43", "30.8 / 43", "30.9 / 43", "30.10 / 43", "31 / 43", "32.1 / 43", "32.2 / 43", "32.3 / 43", "32.4 / 43", "32.5 / 43", "32.6 / 43", "32.7 / 43", "32.8 / 43", "32.9 / 43", "32.10 / 43", "32.11 / 43", "32.12 / 43", "32.13 / 43", "32.14 / 43", "33.1 / 43", "33.2 / 43", "33.3 / 43", "33.4 / 43", "34.1 / 43", "34.2 / 43", "34.3 / 43", "34.4 / 43", "34.5 / 43", "34.6 / 43", "35.1 / 43", "35.2 / 43", "35.3 / 43", "35.4 / 43", "35.5 / 43", "35.6 / 43", "35.7 / 43", "35.8 / 43", "35.9 / 43", "35.10 / 43", "36 / 43", "37.1 / 43", "37.2 / 43", "37.3 / 43", "38 / 43", "39.1 / 43", "39.2 / 43", "39.3 / 43", "39.4 / 43", "39.5 / 43", "40.1 / 43", "40.2 / 43", "40.3 / 43", "40.4 / 43", "41.1 / 43", "41.2 / 43", "42 / 43", "43 / 43", "A", "A1.1", "A1.2", "A2.1", "A2.2", "A2.3", "A2.4", "A2.5", "A2.6", "A2.7", "A2.8", "A2.9", "A2.10", "A2.11", "A2.12", "A2.13", "A2.14", "A2.15", "A2.16", "A2.17", "A2.18", "A3.1", "A3.2", "A3.3", "A3.4", "A3.5", "A3.6", "A3.7", "A3.8", "A3.9", "A3.10", "A3.11", "A3.12", "A3.13", "A3.14", "A3.15", "A3.16", "A3.17", "A3.18", "A3.19", "A3.20", "A3.21", "A3.22"];
+const proofBtn = document.getElementById("proof"), backBtn = document.getElementById("back");
+const badgeEl = document.getElementById("badge");
+let ret = null;                      // the slide a jump left from
+function videoRect() {               // where the 16:9 picture sits inside the window
+  const ar = RES[0] / RES[1], vw = innerWidth, vh = innerHeight;
+  let w = vw, h = vw / ar;
+  if (h > vh) { h = vh; w = vh * ar; }
+  return {x: (vw - w) / 2, y: (vh - h) / 2, w, h};
+}
+function placeButtons() {
+  const r = videoRect();
+  if (CHIP) Object.assign(proofBtn.style, {
+    left: r.x + CHIP.left * r.w + "px", top: r.y + CHIP.top * r.h + "px",
+    width: CHIP.width * r.w + "px", height: CHIP.height * r.h + "px"});
+  Object.assign(backBtn.style, {
+    right: innerWidth - (r.x + r.w) + 0.015 * r.w + "px", top: r.y + 0.02 * r.h + "px"});
+  // 0.2 units from the right and bottom edges, like the chip's bottom (frame: 14.2 x 8
+  // units); low enough to clear the zoom tour's timeline track
+  Object.assign(badgeEl.style, {
+    right: innerWidth - (r.x + r.w) + 0.014 * r.w + "px",
+    bottom: innerHeight - (r.y + r.h) + 0.025 * r.h + "px", fontSize: 0.02 * r.h + "px"});
+}
+function updateButtons() {
+  proofBtn.hidden = !CHIP || PROOF[i] < 0;
+  backBtn.hidden = BACK[i] < 0;
+  badgeEl.textContent = BADGE[i] || "";
+}
+function jumpToProof() { if (PROOF[i] >= 0) { ret = i; show(PROOF[i]); } }
+function jumpBack() {
+  if (BACK[i] < 0) return;
+  const t = ret ?? BACK[i];
+  ret = null;
+  show(t, true);
+}
+proofBtn.addEventListener("click", e => { e.stopPropagation(); jumpToProof(); });
+backBtn.addEventListener("click", e => { e.stopPropagation(); jumpBack(); });
+addEventListener("resize", placeButtons);
+placeButtons();
+updateButtons();
+
+document.addEventListener("keydown", e => {
+  const k = e.key;
+  if (k === "p" || k === "P") jumpToProof();
+  else if (k === "b" || k === "B") jumpBack();
+  else if (["ArrowRight", "ArrowDown", " ", "PageDown", "Enter"].includes(k)) show(i + 1);
+  else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(k)) show(i - 1, true);
+  else if (k === "Home") show(0);
+  else if (k === "End") show(SLIDES.length - 1, true);
+  else if (k === "f" || k === "F") {
+    document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  } else return;
+  e.preventDefault();
+});
+document.addEventListener("click", () => show(i + 1));
+document.addEventListener("contextmenu", e => { e.preventDefault(); show(i - 1, true); });
+
+// Start: first slide waits for a click (browsers block autoplay otherwise only if unmuted).
+load(front, 0).then(() => { front.play().catch(() => {}); if (SLIDES.length > 1) load(back, 1); });
+</script>
+</body></html>

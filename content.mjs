@@ -78,6 +78,16 @@ export const research = [
   },
 ];
 
+export const projects = [
+  {
+    title: "Aiyagari (1995): Optimal Capital Income Taxation with Incomplete Markets",
+    dek: "Animated presentation of why capital income should be taxed when households face uninsurable risk and borrowing limits. Click or press → to advance, ← to go back, F for full screen.",
+    meta: "Public Finance, CERGE-EI",
+    date: "2026",
+    links: [{ label: "Open presentation", href: "/projects/aiyagari/" }],
+  },
+];
+
 export const writing = {
   intro: "Commentary written at Moody’s.",
   items: [

@@ -1,7 +1,7 @@
 // Zero-dependency static site generator: content.mjs -> dist/
 import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { site, home, research, writing, cv } from "./content.mjs";
+import { site, home, research, projects, writing, cv } from "./content.mjs";
 
 const OUT = "dist";
 const hasCvPdf = process.argv.includes("--with-cv-pdf");
@@ -9,6 +9,7 @@ const hasCvPdf = process.argv.includes("--with-cv-pdf");
 const nav = [
   ["/", "Home"],
   ["/research/", "Research"],
+  ["/projects/", "Projects"],
   ["/cv/", "CV"],
   ["/writing/", "Public"],
 ];
@@ -89,6 +90,14 @@ ${row("Commentary", writing.items.map((w) => `<article class="entry">
 ${w.links?.length ? `<div class="links">${w.links.map((l) => `<a href="${l.href}">${l.label}</a>`).join("")}</div>` : ""}
 </article>`).join(""))}`;
 
+const projectsBody = `<div class="page-head"><h1>Projects</h1></div>
+${row("Presentations", projects.map((w) => `<article class="entry">
+<h3>${w.title}</h3>
+<p class="dek">${w.dek}</p>
+<div class="meta small"><span>${w.meta}</span><span>${w.date}</span></div>
+${w.links?.length ? `<div class="links">${w.links.map((l) => `<a href="${l.href}">${l.label}</a>`).join("")}</div>` : ""}
+</article>`).join(""))}`;
+
 const notFound = `<div class="page-head"><h1>Page not found</h1><p>The page may have moved. <a href="/">Back to the home page</a>.</p></div>`;
 
 const pages = {
@@ -96,6 +105,7 @@ const pages = {
   "research/index.html": page("/research/", `Research · ${site.name}`, researchBody),
   "cv/index.html": page("/cv/", `CV · ${site.name}`, cvBody),
   ...(hasCvPdf && { "cv/print/index.html": page("/cv/print/", `CV · ${site.name}`, cvHtml) }),
+  "projects/index.html": page("/projects/", `Projects · ${site.name}`, projectsBody),
   "writing/index.html": page("/writing/", `Commentaries · ${site.name}`, writingBody),
   "404.html": page("/404.html", `Not found · ${site.name}`, notFound),
 };
@@ -103,6 +113,7 @@ const pages = {
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT);
 cpSync("assets", join(OUT, "assets"), { recursive: true });
+cpSync("projects", join(OUT, "projects"), { recursive: true });
 for (const [file, html] of Object.entries(pages)) {
   mkdirSync(join(OUT, dirname(file)), { recursive: true });
   writeFileSync(join(OUT, file), html);
